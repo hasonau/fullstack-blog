@@ -20,37 +20,87 @@ export const clerkWebHook = async (req, res) => {
         return res.status(400).json({ message: "Webhook Error: " + err.message });
     }
 
-    // console.log("Received event:", evt.type, evt.data);
+    console.log("Received event:", evt.data);
+
+    // if (evt.type === 'user.created') {
+    //     const newUser = new User({
+    //         clerkuserID: evt.data.id,
+    //         username: evt.data.username || `${evt.data.first_name || ''}${evt.data.last_name || ''}`.trim(),
+    //         email: evt.data.email_addresses[0]?.email_address,
+    //         img: evt.data.profile_image_url
+    //     });
+
+    //     await newUser.save();
+    // }
+
+    // if (evt.type === "user.deleted") {
+    //     const deletedUser = await User.findOneAndDelete({
+    //         clerkuserID: evt.data.id,
+    //     });
+
+    //     await Post.deleteMany({ user: deletedUser._id })
+    //     await Comment.deleteMany({ user: deletedUser._id })
+    // }
+
+    // if (evt.type === "user.updated") {
+    //     const updatedUser = await User.findOne({ clerkuserID: evt.data.id });
+    //     if (updatedUser) {
+    //         updatedUser.username = evt.data.username || updatedUser.username;
+    //         updatedUser.email = evt.data.email_addresses[0]?.email_address || updatedUser.email;
+    //         updatedUser.img = evt.data.profile_image_url || updatedUser.img;
+    //         await updatedUser.save();
+    //     }
+    // }
 
     if (evt.type === 'user.created') {
-        const newUser = new User({
-            clerkuserID: evt.data.id,
-            username: evt.data.username || `${evt.data.first_name || ''}${evt.data.last_name || ''}`.trim(),
-            email: evt.data.email_addresses[0]?.email_address,
-            img: evt.data.profile_image_url,
-        });
+        try {
+            // Extract values safely
+            const clerkID = evt.data.id;
+            const username = evt.data.username || `${evt.data.first_name || ''}${evt.data.last_name || ''}`.trim() || `user_${Date.now()}`;
+            const email = evt.data.email_addresses?.[0]?.email_address || `no-email-${Date.now()}@example.com`;
+            const img = evt.data.profile_image_url || "";
 
-        await newUser.save();
+            const newUser = new User({
+                clerkUserID: clerkID,  // must match schema field exactly
+                username,
+                email,
+                img
+            });
+
+            await newUser.save();
+            console.log("New user saved:", newUser._id);
+        } catch (err) {
+            console.error("Error saving new user:", err);
+        }
     }
 
-    if (evt.type === "user.deleted") {
-        const deletedUser = await User.findOneAndDelete({
-            clerkuserID: evt.data.id,
-        });
 
-        await Post.deleteMany({ user: deletedUser._id })
-        await Comment.deleteMany({ user: deletedUser._id })
+    if (evt.type === "user.deleted") {
+        try {
+            const deletedUser = await User.findOneAndDelete({ clerkUserID: evt.data.id });
+            if (deletedUser) {
+                await Post.deleteMany({ user: deletedUser._id });
+                await Comment.deleteMany({ user: deletedUser._id });
+            }
+        } catch (err) {
+            console.error("Error deleting user/posts/comments:", err);
+        }
     }
 
     if (evt.type === "user.updated") {
-        const updatedUser = await User.findOne({ clerkuserID: evt.data.id });
-        if (updatedUser) {
-            updatedUser.username = evt.data.username || updatedUser.username;
-            updatedUser.email = evt.data.email_addresses[0]?.email_address || updatedUser.email;
-            updatedUser.img = evt.data.profile_image_url || updatedUser.img;
-            await updatedUser.save();
+        try {
+            const updatedUser = await User.findOne({ clerkUserID: evt.data.id });
+            if (updatedUser) {
+                updatedUser.username = evt.data.username || updatedUser.username;
+                updatedUser.email = evt.data.email_addresses[0]?.email_address || updatedUser.email;
+                updatedUser.img = evt.data.profile_image_url || updatedUser.img;
+                await updatedUser.save();
+            }
+        } catch (err) {
+            console.error("Error updating user:", err);
         }
     }
+
 
     return res.status(200).json({ message: "Webhook received" });
 };
