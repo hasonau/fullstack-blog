@@ -17,7 +17,9 @@ const Write = () => {
     const [progress, setProgress] = useState(0);
 
     useEffect(() => {
-        img && setValue((prev) => prev + `<p><image src="${img.url}"/></p>`);
+        if (img) {
+            setValue((prev) => prev + `<p><img src="${img.url}" alt="uploaded" /></p>`);
+        }
     }, [img]);
 
     useEffect(() => {
@@ -76,13 +78,14 @@ const Write = () => {
             <h1 className="text-cl font-light">Create a New Post</h1>
             <form onSubmit={handleSubmit} className="flex flex-col gap-6 flex-1 mb-6">
                 <Upload type="image" setProgress={setProgress} setData={setCover}>
-                    <button className="w-max p-2 shadow-md rounded-xl text-sm text-gray-500 bg-white">
+                    <button type="button" className="w-max p-2 shadow-md rounded-xl text-sm text-gray-500 bg-white">
                         Add a cover image
                     </button>
                 </Upload>
                 <input
                     className="text-4xl font-semibold bg-transparent outline-none"
                     type="text"
+                    required
                     placeholder="My Awesome Story"
                     name="title"
                 />
@@ -105,6 +108,7 @@ const Write = () => {
                 </div>
                 <textarea
                     className="p-4 rounded-xl bg-white shadow-md"
+                    required
                     name="desc"
                     placeholder="A Short Description"
                 />

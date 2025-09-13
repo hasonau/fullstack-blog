@@ -1,8 +1,9 @@
 import express from 'express';
-import { getPosts, getPost, createPost, deletePost } from '../controllers/post.controller.js';
+import { getPosts, getPost, createPost, deletePost, uploadAuth } from '../controllers/post.controller.js';
 
 const postRouter = express.Router();
 
+postRouter.get("/upload-auth", uploadAuth);
 postRouter.get("/", getPosts);
 postRouter.get("/:slug", getPost);
 postRouter.post("/", createPost);
