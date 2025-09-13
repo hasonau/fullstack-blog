@@ -4,8 +4,11 @@ import postRouter from './routes/post.route.js';
 import commentRouter from './routes/comment.route.js';
 import { webhookRouter } from "./routes/webhook.route.js";
 import { clerkMiddleware } from "@clerk/express";
+import cors from 'cors';
+
 
 const app = express();
+app.use(cors(process.env.CLIENT_URL || 'http://localhost:5173'));
 app.use('/api/webhooks', webhookRouter);
 app.use(express.json());
 app.use(clerkMiddleware());

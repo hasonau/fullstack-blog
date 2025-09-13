@@ -11,25 +11,37 @@ const getPost = async (req, res) => {
     res.status(200).json(post);
 }
 export const createPost = async (req, res) => {
-    const { userId: clerkUserId } = req.auth;
+    try {
+        const { userId: clerkUserId } = req.auth;
 
-    console.log("clerkUserId:", clerkUserId);
-    console.log("Full req.auth:", req.auth);
+        if (!clerkUserId) {
+            return res.status(401).json("Not authenticated!");
+        }
 
-    if (!clerkUserId) {
-        return res.status(401).json("Not authenticated!");
+        const user = await User.findOne({ clerkUserID: clerkUserId });
+
+        if (!user) {
+            return res.status(404).json("User not found!");
+        }
+
+        let baseSlug = req.body.title.replace(/ /g, "-").toLowerCase();
+        let slug = baseSlug;
+        let existingPost = await Post.findOne({ slug });
+        let suffix = 2;
+
+        while (existingPost) {
+            slug = `${baseSlug}-${suffix}`;
+            existingPost = await Post.findOne({ slug });
+            suffix++;
+        }
+
+        const newPost = new Post({ user: user._id, slug, ...req.body });
+        const post = await newPost.save();
+        res.status(200).json(post);
+    } catch (error) {
+        console.error("Error creating post:", error);
+        res.status(500).json({ message: error.message });
     }
-
-    const user = await User.findOne({ clerkUserID: clerkUserId });
-
-    if (!user) {
-        return res.status(404).json("User not found!");
-    }
-
-    const newPost = new Post({ user: user._id, ...req.body });
-
-    const post = await newPost.save();
-    res.status(200).json(post);
 };
 
 

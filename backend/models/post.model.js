@@ -9,10 +9,11 @@ const postSchema = new Schema(
         },
         img: { type: String },
         title: {
-            type: String, required: true, unique: true
+            type: String, required: true,
         },
+        category: { type: String, default: "general" },
         slug: { type: String, required: true, unique: true },
-        desc: { type: String, required: true },
+        desc: { type: String },
         content: { type: String, required: true },
         isFeatured: { type: Boolean, default: false },
         visit: { type: Number, default: 0 },

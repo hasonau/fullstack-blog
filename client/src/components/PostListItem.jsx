@@ -3,13 +3,16 @@ import Image from "./Image";
 import { format } from "timeago.js";
 
 const PostListItem = ({ post }) => {
+    if (!post) {
+        return <div>Loading...</div>; // or return null
+    }
     return (
         <div className="flex flex-col xl:flex-row gap-8 mb-12">
             {/* image */}
-            {post.img && (
+            {post.user?.img && (
                 <div className="md:hidden xl:block xl:w-1/3">
                     <Image
-                        src={post.img}
+                        src={post.user?.img}
                         className="rounded-2xl object-cover"
                         w="735"
                     />
