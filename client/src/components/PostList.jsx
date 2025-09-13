@@ -1,5 +1,5 @@
 import PostListItem from "./PostListItem";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useSearchParams } from "react-router-dom";
@@ -7,21 +7,16 @@ import { useSearchParams } from "react-router-dom";
 const fetchPosts = async (pageParam, searchParams) => {
     const searchParamsObj = Object.fromEntries([...searchParams]);
 
+    console.log(searchParamsObj);
+
     const res = await axios.get(`${import.meta.env.VITE_API_URL}/posts`, {
         params: { page: pageParam, limit: 10, ...searchParamsObj },
     });
-
     return res.data;
 };
 
-// temporary mock data (remove later when backend works)
-const mockPosts = [
-    { _id: "1", title: "First dummy post", content: "This is placeholder content." },
-    { _id: "2", title: "Second dummy post", content: "More placeholder content." },
-];
-
 const PostList = () => {
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const {
         data,
@@ -29,24 +24,29 @@ const PostList = () => {
         fetchNextPage,
         hasNextPage,
         isFetching,
+        isFetchingNextPage,
+        status,
     } = useInfiniteQuery({
         queryKey: ["posts", searchParams.toString()],
         queryFn: ({ pageParam = 1 }) => fetchPosts(pageParam, searchParams),
         initialPageParam: 1,
         getNextPageParam: (lastPage, pages) =>
-            lastPage?.hasMore ? pages.length + 1 : undefined,
-        enabled: !!import.meta.env.VITE_API_URL, // prevent running if API not ready
+            lastPage.hasMore ? pages.length + 1 : undefined,
     });
 
+    // if (status === "loading") return "Loading...";
     if (isFetching) return "Loading...";
+
+
+    // if (status === "error") return "Something went wrong!";
     if (error) return "Something went wrong!";
 
-    const allPosts = data?.pages?.flatMap((page) => page.posts) || mockPosts;
+    const allPosts = data?.pages?.flatMap((page) => page.posts) || [];
 
     return (
         <InfiniteScroll
             dataLength={allPosts.length}
-            next={fetchNextPage || (() => { })}
+            next={fetchNextPage}
             hasMore={!!hasNextPage}
             loader={<h4>Loading more posts...</h4>}
             endMessage={
@@ -55,8 +55,8 @@ const PostList = () => {
                 </p>
             }
         >
-            {allPosts.map((post, i) => (
-                <PostListItem key={post?._id || i} post={post} />
+            {allPosts.map((post) => (
+                <PostListItem key={post._id} post={post} />
             ))}
         </InfiniteScroll>
     );
