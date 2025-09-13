@@ -22,35 +22,6 @@ export const clerkWebHook = async (req, res) => {
 
     console.log("Received event:", evt.data);
 
-    // if (evt.type === 'user.created') {
-    //     const newUser = new User({
-    //         clerkuserID: evt.data.id,
-    //         username: evt.data.username || `${evt.data.first_name || ''}${evt.data.last_name || ''}`.trim(),
-    //         email: evt.data.email_addresses[0]?.email_address,
-    //         img: evt.data.profile_image_url
-    //     });
-
-    //     await newUser.save();
-    // }
-
-    // if (evt.type === "user.deleted") {
-    //     const deletedUser = await User.findOneAndDelete({
-    //         clerkuserID: evt.data.id,
-    //     });
-
-    //     await Post.deleteMany({ user: deletedUser._id })
-    //     await Comment.deleteMany({ user: deletedUser._id })
-    // }
-
-    // if (evt.type === "user.updated") {
-    //     const updatedUser = await User.findOne({ clerkuserID: evt.data.id });
-    //     if (updatedUser) {
-    //         updatedUser.username = evt.data.username || updatedUser.username;
-    //         updatedUser.email = evt.data.email_addresses[0]?.email_address || updatedUser.email;
-    //         updatedUser.img = evt.data.profile_image_url || updatedUser.img;
-    //         await updatedUser.save();
-    //     }
-    // }
 
     if (evt.type === 'user.created') {
         try {

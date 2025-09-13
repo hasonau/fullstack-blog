@@ -3,12 +3,17 @@ import userRouter from './routes/user.route.js';
 import postRouter from './routes/post.route.js';
 import commentRouter from './routes/comment.route.js';
 import { webhookRouter } from "./routes/webhook.route.js";
-// import { clerkMiddleware } from "@clerk/express";
+import { clerkMiddleware } from "@clerk/express";
 
 const app = express();
-// app.use(clerkMiddleware());
 app.use('/api/webhooks', webhookRouter);
 app.use(express.json());
+app.use(clerkMiddleware());
+
+
+//#region Testing Clerk Auth
+
+// without requireAuth(); need to check for req.auth
 
 // app.get("/auth-state", (req, res) => {
 //     const { userId } = req.auth;
@@ -18,13 +23,15 @@ app.use(express.json());
 //     res.status(200).json({ userId });
 // });
 
-// app.get("/protect", (req, res) => {
+
+// with requireAuth(); no need to check for req.auth ,it will always be there
+
+// app.get("/auth-state", requireAuth(), (req, res) => {
 //     const { userId } = req.auth;
-//     if (!userId) {
-//         return res.status(401).json({ message: "Unauthorized" });
-//     }
 //     res.status(200).json({ userId });
 // });
+
+//#endregion
 
 app.use('/users', userRouter);
 app.use('/posts', postRouter);
