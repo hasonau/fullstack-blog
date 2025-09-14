@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config();
 import ImageKit from "imagekit";
 import Post from "../models/post.model.js";
 import User from "../models/user.model.js";
@@ -68,22 +70,34 @@ export const getPosts = async (req, res) => {
     .limit(limit)
     .skip((page - 1) * limit);
 
-  const totalPosts = await Post.countDocuments();
+  // fallback for deleted users
+  const postsWithFallback = posts.map(post => {
+    if (!post.user) {
+      post = post.toObject();
+      post.user = { username: "Deleted User" };
+    }
+    return post;
+  });
+
+  const totalPosts = await Post.countDocuments(query);
   const hasMore = page * limit < totalPosts;
 
-  res.status(200).json({ posts, hasMore });
+  res.status(200).json({ posts: postsWithFallback, hasMore });
 };
-
 export const getPost = async (req, res) => {
-  const post = await Post.findOne({ slug: req.params.slug }).populate(
-    "user",
-    "username img"
-  );
+  let post = await Post.findOne({ slug: req.params.slug }).populate("user", "username img");
+
+  if (post && !post.user) {
+    post = post.toObject(); // convert to plain JS object
+    post.user = { username: "Deleted User", img: "" }; // fallback
+  }
+
   res.status(200).json(post);
 };
 
+
 export const createPost = async (req, res) => {
-  const clerkUserId = req.auth.userId;
+  const { userId: clerkUserId } = req.auth;
 
   console.log(req.headers);
 
@@ -177,12 +191,17 @@ export const featurePost = async (req, res) => {
 };
 
 const imagekit = new ImageKit({
+
   urlEndpoint: process.env.IK_URL_ENDPOINT,
   publicKey: process.env.IK_PUBLIC_KEY,
   privateKey: process.env.IK_PRIVATE_KEY,
 });
 
 export const uploadAuth = async (req, res) => {
+  console.log("IK_URL_ENDPOINT:", process.env.IK_URL_ENDPOINT);
+  console.log("IK_PUBLIC_KEY:", process.env.IK_PUBLIC_KEY);
+  console.log("IK_PRIVATE_KEY:", process.env.IK_PRIVATE_KEY);
+
   const result = imagekit.getAuthenticationParameters();
   res.send(result);
 };

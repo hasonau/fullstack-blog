@@ -17,7 +17,7 @@ const Write = () => {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    img && setValue((prev) => prev + `<p><image src="${img.url}"/></p>`);
+    img && setValue((prev) => prev + `<p><img src="${img.url}"/></p>`);
   }, [img]);
 
   useEffect(() => {
@@ -34,17 +34,33 @@ const Write = () => {
   const mutation = useMutation({
     mutationFn: async (newPost) => {
       const token = await getToken();
-      return axios.post(`${import.meta.env.VITE_API_URL}/posts`, newPost, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      console.log("Posting to:", `${import.meta.env.VITE_API_URL}/posts`);
+      console.log("Data being sent:", newPost);
+      console.log("Token:", token);
+
+      try {
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_URL}/posts`,
+          newPost,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log("Response:", response.data);
+        return response;
+      } catch (err) {
+        console.error("Axios error:", err.response?.data || err.message);
+        throw err;
+      }
     },
     onSuccess: (res) => {
       toast.success("Post has been created");
       navigate(`/${res.data.slug}`);
     },
   });
+
 
   if (!isLoaded) {
     return <div className="">Loading...</div>;
