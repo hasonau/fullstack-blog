@@ -30,8 +30,8 @@ const Homepage = () => {
             viewBox="0 0 200 200"
             width="200"
             height="200"
-            // className="text-lg tracking-widest animate-spin animatedButton"
-            className="text-lg tracking-widest"
+            className="text-lg tracking-widest animate-spin animatedButton"
+          // className="text-lg tracking-widest"
           >
             <path
               id="circlePath"
@@ -70,7 +70,7 @@ const Homepage = () => {
       {/* POST LIST */}
       <div className="">
         <h1 className="my-8 text-2xl text-gray-600">Recent Posts</h1>
-        <PostList/>
+        <PostList />
       </div>
     </div>
   );

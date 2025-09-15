@@ -60,6 +60,7 @@ const SinglePostPage = () => {
           <h1 className="mb-4 text-sm font-medium">Author</h1>
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-8">
+              {/* <pre>{JSON.stringify(data.user, null, 2)}</pre> */}
               {data.user.img && (
                 <Image
                   src={data.user.img}
