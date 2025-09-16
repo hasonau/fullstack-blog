@@ -61,7 +61,6 @@ const Write = () => {
     },
   });
 
-
   if (!isLoaded) {
     return <div className="">Loading...</div>;
   }
@@ -92,7 +91,11 @@ const Write = () => {
       <h1 className="text-cl font-light">Create a New Post</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-6 flex-1 mb-6">
         <Upload type="image" setProgress={setProgress} setData={setCover}>
-          <button type="button" className="w-max p-2 shadow-md rounded-xl text-sm text-gray-500 bg-white">
+          <button
+            type="button"
+            className="w-max p-2 shadow-md rounded-xl text-sm text-gray-500 bg-white cursor-pointer hover:bg-gray-50"
+            style={{ cursor: 'pointer' }}
+          >
             Add a cover image
           </button>
         </Upload>
@@ -109,7 +112,7 @@ const Write = () => {
           <select
             name="category"
             id=""
-            className="p-2 rounded-xl bg-white shadow-md"
+            className="p-2 rounded-xl bg-white shadow-md cursor-pointer"
           >
             <option value="general">General</option>
             <option value="web-design">Web Design</option>
@@ -124,26 +127,40 @@ const Write = () => {
           name="desc"
           placeholder="A Short Description"
         />
-        <div className="flex flex-1 ">
-          <div className="flex flex-col gap-2 mr-2">
-            <Upload type="image" setProgress={setProgress} setData={setImg}>
-              🌆
-            </Upload>
-            <Upload type="video" setProgress={setProgress} setData={setVideo}>
-              ▶️
-            </Upload>
-          </div>
+        <div className="flex flex-col gap-4 flex-1">
           <ReactQuill
             theme="snow"
-            className="flex-1 rounded-xl bg-white shadow-md"
+            className="flex-1 rounded-xl bg-white shadow-md min-h-[300px]"
             value={value}
             onChange={setValue}
             readOnly={0 < progress && progress < 100}
+            style={{ height: 'auto' }}
           />
+          <div className="flex gap-2">
+            <Upload type="image" setProgress={setProgress} setData={setImg}>
+              <button
+                type="button"
+                className="px-3 py-1 rounded-lg bg-gray-100 shadow text-sm cursor-pointer hover:bg-gray-200 select-none"
+                style={{ cursor: 'pointer' }}
+              >
+                <span className="cursor-pointer" >🌆</span>
+              </button>
+            </Upload>
+            <Upload type="video" setProgress={setProgress} setData={setVideo}>
+              <button
+                type="button"
+                className="px-3 py-1 rounded-lg bg-gray-100 shadow text-sm cursor-pointer hover:bg-gray-200 select-none"
+                style={{ cursor: 'pointer' }}
+              >
+                ▶️
+              </button>
+            </Upload>
+          </div>
         </div>
+
         <button
           disabled={mutation.isPending || (0 < progress && progress < 100)}
-          className="bg-blue-800 text-white font-medium rounded-xl mt-4 p-2 w-36 disabled:bg-blue-400 disabled:cursor-not-allowed"
+          className="bg-blue-800 text-white font-medium rounded-xl mt-4 p-2 w-36 disabled:bg-blue-400 disabled:cursor-not-allowed cursor-pointer"
         >
           {mutation.isPending ? "Loading..." : "Send"}
         </button>
